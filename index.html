@@ -11,8 +11,8 @@
             padding-bottom: 100%; /* Aspect ratio of 16:9 */
             height: 0;
         }
-/* Apply responsive styles to the iframe */
-iframe {
+        /* Apply responsive styles to the iframe */
+        iframe {
             width: 100%;
             height: 100%;
             max-width: 800px; /* Adjust the max-width as needed */
@@ -31,7 +31,9 @@ iframe {
 </head>
 <body>
     <div class="calendar-container">
-        <iframe src="https://calendar.google.com/calendar/embed?src=mail.ic.edu_fpdm731abrq0a6d64hv5v8992c%40group.calendar.google.com&ctz=America%2FChicago&mode=DAY" frameborder="0" scrolling="no"></iframe>
+        <!-- Add the dates parameter to always show the current date -->
+        <iframe src="https://calendar.google.com/calendar/embed?src=mail.ic.edu_fpdm731abrq0a6d64hv5v8992c%40group.calendar.google.com&ctz=America%2FChicago&mode=DAY&dates=today%2Ftoday" frameborder="0" scrolling="no"></iframe>
     </div>
 </body>
 </html>
+
