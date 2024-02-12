@@ -5,28 +5,127 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IC Dining</title>
     <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
+        #service-buttons {
+            margin-bottom: 20px; /* Add some space between buttons and other content */
         }
-        .calendar-container {
-            width: 100%;
-            padding-top: 56.25%; /* Aspect ratio of 16:9 */
-            position: relative;
-        }
-        .calendar-container iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: 0;
+        button {
+            font-size: 1.25em; /* Increase button size */
+            margin-right: 10px; /* Add space between buttons */
         }
     </style>
 </head>
 <body>
-    <div class="calendar-container">
-        <iframe src="https://calendar.google.com/calendar/embed?src=mail.ic.edu_fpdm731abrq0a6d64hv5v8992c%40group.calendar.google.com&ctz=America%2FChicago&mode=DAY" frameborder="0" scrolling="no"></iframe>
-    </div>
+    <h1>Cummings Dining Hall</h1>
+    <!-- Container for service buttons -->
+    <div id="service-buttons"></div>
+
+    <div id="currently"></div>
+    <div id="viewing-header"></div> <!-- New header for viewing current menu -->
+    <div id="menu"></div>
+    <div id="next-service"></div>
+
+    <script>
+        // Your Google Calendar API key
+        const apiKey = 'AIzaSyAgGt_ZjpjvBYI1r1Zus0OWUo1Qrf14GEU';
+
+        // ID of the Google Calendar you want to fetch events from
+        const calendarId = 'mail.ic.edu_fpdm731abrq0a6d64hv5v8992c@group.calendar.google.com';
+
+        // Date for which you want to fetch events (e.g., today)
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        const formattedToday = `${year}-${month}-${day}`;
+
+        // Service keywords and their corresponding start and end times
+        const services = [
+            { name: 'Breakfast Service', startTime: '07:00', endTime: '10:30' },
+            { name: 'Lunch Service', startTime: '11:00', endTime: '14:00' },
+            { name: 'Afternoon Service', startTime: '14:00', endTime: '17:00' },
+            { name: 'Dinner Service', startTime: '17:00', endTime: '20:00' },
+            { name: 'Late Night Service', startTime: '20:00', endTime: '23:59' }
+        ];
+
+        // Function to convert time to 12-hour format
+        function to12HourFormat(time) {
+            const [hours, minutes] = time.split(':');
+            const hour = parseInt(hours, 10);
+            const suffix = hour >= 12 ? 'PM' : 'AM';
+            const adjustedHour = hour % 12 || 12;
+            return `${adjustedHour}:${minutes} ${suffix}`;
+        }
+
+        // Function to display menu items (meeting notes) for the given event
+        function displayMenu(event) {
+            if (event && event.description) {
+                document.getElementById('menu').innerHTML = `<h2>Menu:</h2><p>${event.description}</p>`;
+            } else {
+                document.getElementById('menu').innerHTML = `<p>No menu available for this service.</p>`;
+            }
+        }
+
+        // Fetch events from Google Calendar API
+        fetch(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events?key=${apiKey}&timeMin=${formattedToday}T00:00:00Z&timeMax=${formattedToday}T23:59:59Z`)
+            .then(response => response.json())
+            .then(data => {
+                const events = data.items;
+                // Create buttons for each event
+                services.forEach(service => {
+                    const event = events.find(event => event.summary === service.name);
+                    if (event) {
+                        const serviceButton = document.createElement('button');
+                        serviceButton.textContent = service.name;
+                        serviceButton.addEventListener('click', () => {
+                            displayMenu(event);
+                            document.getElementById('viewing-header').textContent = `*Viewing ${service.name}*`;
+                        });
+                        document.getElementById('service-buttons').appendChild(serviceButton); // Append buttons to "service-buttons" div
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching events:', error);
+                document.getElementById('menu').innerHTML = `<p>Error fetching events: ${error.message}</p>`;
+            });
+
+        // Find the current service
+        const currentService = services.find(service => {
+            const startTime = new Date(`${formattedToday}T${service.startTime}:00`);
+            const endTime = new Date(`${formattedToday}T${service.endTime}:00`);
+            return today >= startTime && today < endTime;
+        });
+
+        // Display the current service or "No services currently available"
+        if (currentService) {
+            document.getElementById('currently').innerHTML = `<h2>Currently: ${currentService.name} (until ${to12HourFormat(currentService.endTime)})</h2>`;
+            // Fetch events from Google Calendar API
+            fetch(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events?key=${apiKey}&timeMin=${formattedToday}T00:00:00Z&timeMax=${formattedToday}T23:59:59Z`)
+                .then(response => response.json())
+                .then(data => {
+                    const currentEvent = data.items.find(event => event.summary === currentService.name);
+                    displayMenu(currentEvent);
+                })
+                .catch(error => {
+                    console.error('Error fetching events:', error);
+                    document.getElementById('menu').innerHTML = `<p>Error fetching events: ${error.message}</p>`;
+                });
+        } else {
+            document.getElementById('currently').innerHTML = `<p>No services currently available.</p>`;
+        }
+
+        // Find the next service
+        const nextService = services.find(service => {
+            const startTime = new Date(`${formattedToday}T${service.startTime}:00`);
+            return today < startTime;
+        });
+
+        // Display the name of the next service or "No upcoming service"
+        if (nextService) {
+            document.getElementById('next-service').innerHTML = `<h2>Next Service</h2><p>${nextService.name} (Opens at ${to12HourFormat(nextService.startTime)})</p>`;
+        } else {
+            document.getElementById('next-service').innerHTML = `<p>No upcoming service.</p>`;
+        }
+    </script>
 </body>
 </html>
