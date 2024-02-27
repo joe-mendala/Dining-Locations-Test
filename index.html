@@ -1,131 +1,113 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IC Dining</title>
-    <style>
-        #service-buttons {
-            margin-bottom: 20px; /* Add some space between buttons and other content */
-        }
-        button {
-            font-size: 1.25em; /* Increase button size */
-            margin-right: 10px; /* Add space between buttons */
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dining Locations</title>
+<style>
+  /* Basic styling */
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+  .container {
+    max-width: 400px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  h2 {
+    text-align: center;
+  }
+  .location {
+    margin-bottom: 10px;
+  }
+  .location button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    text-align: center;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  .open {
+    background-color: green;
+    color: #fff;
+  }
+  .closed {
+    background-color: red;
+    color: #fff;
+  }
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .container {
+      max-width: 90%;
+    }
+  }
+</style>
 </head>
 <body>
-    <h1>Cummings Dining Hall</h1>
-    <!-- Container for service buttons -->
-    <div id="service-buttons"></div>
+<div class="container">
+  <h2>Dining Locations</h2>
+  <div class="location" id="location1">
+    <button onclick="redirectToLink('https://joe-mendala.github.io/Cummings-Dining-Hall/')" id="button1">Loading...</button>
+  </div>
+  <div class="location" id="location2">
+    <button onclick="redirectToLink('#')" id="button2">Loading...</button>
+  </div>
+  <div class="location" id="location3">
+    <button onclick="redirectToLink('#')" id="button3">Loading...</button>
+  </div>
+  <div class="location" id="location4">
+    <button onclick="redirectToLink('#')" id="button4">Loading...</button>
+  </div>
+</div>
+<script>
+ // Google Calendar API credentials and calendar IDs
+ const api_key = 'AIzaSyAgGt_ZjpjvBYI1r1Zus0OWUo1Qrf14GEU'; // Replace with your Google API key
+ const calendarIds = ['mail.ic.edu_fpdm731abrq0a6d64hv5v8992c@group.calendar.google.com', 'mail.ic.edu_fgj7dj48u63sb43m768o1dsq3s@group.calendar.google.com', 'mail.ic.edu_7u5b4micgvf5cp8abvvc2s6dfk@group.calendar.google.com', 'mail.ic.edu_ccrkdk1br4c0jcdtc3gnhentok@group.calendar.google.com'];
+ const calendarNames = ['Cummings Dining Hall', 'College Ave. Subs', 'C-Store', 'Starbucks'];
 
-    <div id="currently"></div>
-    <div id="viewing-header"></div> <!-- New header for viewing current menu -->
-    <div id="menu"></div>
-    <div id="next-service"></div>
+ // Function to fetch events from Google Calendar API
+ function fetchEvents(calendarId, buttonId, calendarName) {
+   const now = new Date();
+   const url = `https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events?key=${api_key}&timeMin=${now.toISOString()}&singleEvents=true&orderBy=startTime`;
 
-    <script>
-        // Your Google Calendar API key
-        const apiKey = 'AIzaSyAgGt_ZjpjvBYI1r1Zus0OWUo1Qrf14GEU';
+   fetch(url)
+     .then(response => response.json())
+     .then(data => {
+       console.log('Events for calendar', calendarId, ':', data.items);
+       const events = data.items || [];
+       const activeEvents = events.filter(event => {
+         const start = new Date(event.start.dateTime || event.start.date);
+         const end = new Date(event.end.dateTime || event.end.date);
+         return start <= now && now <= end; // Check if current time is between start and end time of event
+       });
+       console.log('Active events:', activeEvents);
+       const isOpen = activeEvents.length > 0;
+       const button = document.getElementById(buttonId);
+       if (isOpen) {
+         button.innerHTML = `${calendarName} - Open Now`;
+         button.classList.add('open');
+       } else {
+         button.innerHTML = `${calendarName} - Closed Now`;
+         button.classList.add('closed');
+       }
+     })
+     .catch(error => console.error('Error fetching events:', error));
+ }
 
-        // ID of the Google Calendar you want to fetch events from
-        const calendarId = 'mail.ic.edu_fpdm731abrq0a6d64hv5v8992c@group.calendar.google.com';
+ function redirectToLink(link) {
+   window.location.href = link;
+ }
 
-        // Date for which you want to fetch events (e.g., today)
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = String(today.getMonth() + 1).padStart(2, '0');
-        const day = String(today.getDate()).padStart(2, '0');
-        const formattedToday = `${year}-${month}-${day}`;
-
-        // Service keywords and their corresponding start and end times
-        const services = [
-            { name: 'Breakfast Service', startTime: '07:00', endTime: '10:30' },
-            { name: 'Lunch Service', startTime: '11:00', endTime: '14:00' },
-            { name: 'Afternoon Service', startTime: '14:00', endTime: '17:00' },
-            { name: 'Dinner Service', startTime: '17:00', endTime: '20:00' },
-            { name: 'Late Night Service', startTime: '20:00', endTime: '23:59' }
-        ];
-
-        // Function to convert time to 12-hour format
-        function to12HourFormat(time) {
-            const [hours, minutes] = time.split(':');
-            const hour = parseInt(hours, 10);
-            const suffix = hour >= 12 ? 'PM' : 'AM';
-            const adjustedHour = hour % 12 || 12;
-            return `${adjustedHour}:${minutes} ${suffix}`;
-        }
-
-        // Function to display menu items (meeting notes) for the given event
-        function displayMenu(event) {
-            if (event && event.description) {
-                document.getElementById('menu').innerHTML = `<h2>Menu:</h2><p>${event.description}</p>`;
-            } else {
-                document.getElementById('menu').innerHTML = `<p>No menu available for this service.</p>`;
-            }
-        }
-
-        // Fetch events from Google Calendar API
-        fetch(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events?key=${apiKey}&timeMin=${formattedToday}T00:00:00Z&timeMax=${formattedToday}T23:59:59Z`)
-            .then(response => response.json())
-            .then(data => {
-                const events = data.items;
-                // Create buttons for each event
-                services.forEach(service => {
-                    const event = events.find(event => event.summary === service.name);
-                    if (event) {
-                        const serviceButton = document.createElement('button');
-                        serviceButton.textContent = service.name;
-                        serviceButton.addEventListener('click', () => {
-                            displayMenu(event);
-                            document.getElementById('viewing-header').textContent = `*Viewing ${service.name}*`;
-                        });
-                        document.getElementById('service-buttons').appendChild(serviceButton); // Append buttons to "service-buttons" div
-                    }
-                });
-            })
-            .catch(error => {
-                console.error('Error fetching events:', error);
-                document.getElementById('menu').innerHTML = `<p>Error fetching events: ${error.message}</p>`;
-            });
-
-        // Find the current service
-        const currentService = services.find(service => {
-            const startTime = new Date(`${formattedToday}T${service.startTime}:00`);
-            const endTime = new Date(`${formattedToday}T${service.endTime}:00`);
-            return today >= startTime && today < endTime;
-        });
-
-        // Display the current service or "No services currently available"
-        if (currentService) {
-            document.getElementById('currently').innerHTML = `<h2>Currently: ${currentService.name} (until ${to12HourFormat(currentService.endTime)})</h2>`;
-            // Fetch events from Google Calendar API
-            fetch(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events?key=${apiKey}&timeMin=${formattedToday}T00:00:00Z&timeMax=${formattedToday}T23:59:59Z`)
-                .then(response => response.json())
-                .then(data => {
-                    const currentEvent = data.items.find(event => event.summary === currentService.name);
-                    displayMenu(currentEvent);
-                })
-                .catch(error => {
-                    console.error('Error fetching events:', error);
-                    document.getElementById('menu').innerHTML = `<p>Error fetching events: ${error.message}</p>`;
-                });
-        } else {
-            document.getElementById('currently').innerHTML = `<p>No services currently available.</p>`;
-        }
-
-        // Find the next service
-        const nextService = services.find(service => {
-            const startTime = new Date(`${formattedToday}T${service.startTime}:00`);
-            return today < startTime;
-        });
-
-        // Display the name of the next service or "No upcoming service"
-        if (nextService) {
-            document.getElementById('next-service').innerHTML = `<h2>Next Service</h2><p>${nextService.name} (Opens at ${to12HourFormat(nextService.startTime)})</p>`;
-        } else {
-            document.getElementById('next-service').innerHTML = `<p>No upcoming service.</p>`;
-        }
-    </script>
+ // Fetch events for each calendar
+ calendarIds.forEach((calendarId, index) => {
+   fetchEvents(calendarId, `button${index + 1}`, calendarNames[index]);
+ });
+</script>
 </body>
 </html>
