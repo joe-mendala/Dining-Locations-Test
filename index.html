@@ -7,21 +7,37 @@
 <style>
   /* Basic styling */
   body {
-    background: linear-gradient(to left, #003591, #ffffff);
+    background-image: linear-gradient(45deg, rgb(0,53,145) 0%, rgb(0,53,145) 24%,rgb(0,53,145) 24%,
+     rgb(0,53,145) 28%,rgb(0,53,145) 28%, rgb(0,53,145) 40%,rgb(129,138,144) 40%, rgb(129,138,144) 84%,
+     rgb(0,53,145) 84%, rgb(0,53,145) 100%),linear-gradient(0deg, rgb(0,53,145) 0%, rgb(0,53,145) 24%,rgb(0,53,145) 
+     24%, rgb(0,53,145) 28%,rgb(0,53,145) 28%, rgb(0,53,145) 40%,rgb(129,138,144) 40%, rgb(129,138,144) 84%,rgb(0,53,145) 84%,
+      rgb(0,53,145) 100%),linear-gradient(135deg, rgb(0,53,145) 0%, rgb(0,53,145) 24%,rgb(0,53,145) 24%, rgb(0,53,145) 28%,rgb(0,53,145) 28%,
+       rgb(0,53,145) 40%,rgb(129,138,144) 40%, rgb(129,138,144) 84%,rgb(0,53,145) 84%, rgb(0,53,145) 100%),linear-gradient(90deg, rgb(129,138,144),
+       rgb(129,138,144)); 
+       background-blend-mode:overlay,overlay,overlay,normal;
+    background-attachment: fixed; /* Fix the background position */
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
   }
   .container {
-    max-width: 400px;
+    max-width: 430px;
     margin: 20px auto;
     padding: 20px;
-    border: 1px solid #ccc;
+    border: 2.5px solid #ccc;
     border-radius: 10px;
   }
-  h2 {
-    text-align: center;
-  }
+  h1 {
+  text-align: center;
+  margin-bottom: 20px; /* Keep the margin at the bottom */
+  margin-top: 0; /* Remove the margin at the top */
+  color: #ffffff; /* Specify the color of the title */
+  text-shadow: -1px -1px 0 #000,  
+                1px -1px 0 #000,
+                -1px 1px 0 #000,
+                1px 1px 0 #000;
+}
+
   .location {
     margin-bottom: 10px;
   }
@@ -33,6 +49,58 @@
     border: none;
     cursor: pointer;
     border-radius: 5px;
+    position: relative;
+  }
+  .location button.active::after {
+    background-color: black; /* Change color for active button */
+    animation: none; 
+    width: 15px;
+    height: 15px;
+    top: 50%;
+    right: 13px; /* Adjusted position to be closer to the right side */
+    transform: translate(0, -50%);
+  }
+  .location button::after {
+    content: "";
+    position: absolute;
+    top: 35%;
+    right: 13px; /* Adjusted position to be closer to the right side */
+    transform: translate(0, -50%); /* Adjusted to center vertically */
+    width: 10.5px;
+    height: 10.5px;
+    border-radius: 50%;
+    background-color: #fff;
+    animation: pulse 1.5s infinite ease-out;
+  }
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+    100% {
+      transform: scale(1.5);
+      opacity: 0;
+    }
+  }
+  .hours {
+    display: none; /* Hide the hours initially */
+    padding: 10px;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    margin-top: 5px;
+    text-align: justify;
+  }
+  #hours4 li {
+    font-size: 15.5px;
+  }
+  #hours7 {
+    font-size: 15.5px;
+  }
+  #hours9 {
+    font-size: 15.5px;
   }
   .open {
     background-color: #55a51a;
@@ -43,30 +111,77 @@
     color: #fff;
   }
   /* Responsive adjustments */
+  @media (max-width: 388px) {
+    .location button {
+        font-size: 12px;
+    }
+    .location button::after {
+        top: 40%; /* Adjust the vertical position of the pulsating icon */
+        right: 5px; /* Adjust the horizontal position of the pulsating icon */
+        width: 6px; /* Reduce the size of the pulsating icon */
+        height: 6px; /* Reduce the size of the pulsating icon */
+    }
+  }
   @media (max-width: 768px) {
     .container {
       max-width: 90%;
+      border: none;
+    }
+    .location button {
+      font-size: 14px;
     }
   }
 </style>
 </head>
 <body>
-<div class="container">
-  <h2>Dining Locations</h2>
-  <div class="location" id="location1">
-    <button onclick="redirectToLink('https://joe-mendala.github.io/Cummings-Dining-Hall/')" id="button1">Loading...</button>
-  </div>
-  <div class="location" id="location2">
-    <button onclick="redirectToLink('https://www.youtube.com/watch?v=dQw4w9WgXcQ')" id="button2">Loading...</button>
-  </div>
-  <div class="location" id="location3">
-    <button onclick="redirectToLink('https://www.youtube.com/watch?v=dQw4w9WgXcQ')" id="button3">Loading...</button>
-  </div>
-  <div class="location" id="location4">
-    <button onclick="redirectToLink('https://www.youtube.com/watch?v=dQw4w9WgXcQ')" id="button4">Loading...</button>
-  </div>
-</div>
-<script>
+    <div class="container">
+        <h1><u>Dining Hours & Locations</u></h1>
+        <div class="location" id="location1">
+          <button onclick="redirectToLink('https://joe-mendala.github.io/Cummings-Dining-Hall/')" id="button1">Loading...</button>
+        </div>
+        <div class="location" id="location2">
+          <button aria-expanded="false" id="button2" onclick="toggleHours(2)">Baxter - Loading...</button>
+          <div class="hours" id="hours2" aria-hidden="true">
+              <b>Location:</b> Baxter
+              <br>
+              <hr>
+              <u>Hours:</u>
+              <ul>
+                  <li>Monday - Friday | 11 a.m. to 3 p.m.</li>
+                  <li>Saturday & Sunday | <b>Closed</b></li>
+              </ul>
+          </div>
+      </div>
+      <div class="location" id="location3">
+          <button aria-expanded="false" id="button3" onclick="toggleHours(3)">Caine Student Center - Loading...</button>
+          <div class="hours" id="hours3" aria-hidden="true">
+              <b>Location:</b> Caine Student Center
+              <br>
+              <hr>
+              <u>Hours:</u>
+                <ul>
+                  <li>Monday - Friday | 7 a.m. to 9 p.m.</li>
+                  <li>Saturday & Sunday | 11 a.m. to 7 p.m.</li>
+                </ul>
+          </div>
+      </div>
+      <div class="location" id="location4">
+          <button aria-expanded="false" id="button4" onclick="toggleHours(4)">Lincoln - Loading...</button>
+          <div class="hours" id="hours4" aria-hidden="true">
+              <b>Location:</b> Lincoln
+              <br>
+              <hr>
+              <u>Hours:</u>
+              <ul>
+                  <li>Monday - Friday | 7 a.m. to 3 p.m. | 7 p.m. to 10 p.m.</li>
+                  <li>Saturday | <b>Closed</b></li>
+                  <li>Sunday   | 7 p.m. to 10 p.m.</li>
+              </ul>
+          </div>
+      </div>
+      <script>
+
+let lastClickedLocationIndex = null;
  // Google Calendar API credentials and calendar IDs
  const api_key = 'AIzaSyAgGt_ZjpjvBYI1r1Zus0OWUo1Qrf14GEU'; // Replace with your Google API key
  const calendarIds = ['mail.ic.edu_fpdm731abrq0a6d64hv5v8992c@group.calendar.google.com', 'mail.ic.edu_fgj7dj48u63sb43m768o1dsq3s@group.calendar.google.com', 'mail.ic.edu_7u5b4micgvf5cp8abvvc2s6dfk@group.calendar.google.com', 'mail.ic.edu_ccrkdk1br4c0jcdtc3gnhentok@group.calendar.google.com'];
@@ -100,7 +215,38 @@
      })
      .catch(error => console.error('Error fetching events:', error));
  }
+ // Define the closeLastHoursMenu function
+function closeLastHoursMenu() {
+  const lastHoursDiv = document.getElementById(`hours${lastClickedLocationIndex}`);
+  if (lastHoursDiv) {
+    lastHoursDiv.style.display = 'none'; // Close the hours box for the last clicked button
+  }
+}
 
+function toggleHours(locationIndex) {
+  const hoursDiv = document.getElementById(`hours${locationIndex}`);
+  const currentButton = document.getElementById(`button${locationIndex}`);
+  
+  if (hoursDiv) { // Check if the hoursDiv element exists
+    if (hoursDiv.style.display === 'block') {
+      hoursDiv.style.display = 'none'; // If the hours box is already open, close it
+      currentButton.classList.remove('active'); // Remove "active" class from button
+    } else {
+      closeLastHoursMenu(); // Close the hours menu for the last clicked button
+      hoursDiv.style.display = 'block'; // Open the hours box for the clicked button
+      currentButton.classList.add('active'); // Add "active" class to button
+      if (lastClickedLocationIndex !== null) {
+        const lastButton = document.getElementById(`button${lastClickedLocationIndex}`);
+        if (lastButton && lastClickedLocationIndex !== locationIndex) { // Check if the lastButton element exists and it's not the same button clicked again
+          lastButton.classList.remove('active'); // Remove "active" class from previously clicked button
+        }
+      }
+    }
+    lastClickedLocationIndex = locationIndex; // Update the last clicked location index
+  } else {
+    console.error(`Hours element with ID 'hours${locationIndex}' not found.`);
+  }
+}
  function redirectToLink(link) {
    window.location.href = link;
  }
