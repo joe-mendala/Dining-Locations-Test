@@ -197,51 +197,45 @@
 <body>
     <div class="container">
         <h1>Dining Hours & Locations</u></h1>
-        <div class="location" id="location1">
-          <button onclick="redirectToLink('https://joe-mendala.github.io/Cummings-Dining-Hall/')" id="button1">Loading...</button>
-        </div>
-        <div class="location" id="location2">
-          <button aria-expanded="false" id="button2" onclick="toggleHours(2)">Baxter - Loading...</button>
-          <div class="hours" id="hours2" aria-hidden="true">
-              <b>Location:</b> Baxter
+        <section class="location" id="location1">
+          <button aria-label="View Cummings Dining Hall" onclick="redirectToLink('https://joe-mendala.github.io/Cummings-Dining-Hall/')" id="button1">Loading...</button>
+        </section>
+        <section class="location" id="location2">
+          <button aria-expanded="true" id="button2" onclick="toggleHours(2)">Baxter - Loading...</button>
+          <div class="hours" id="hours2" aria-hidden="false">
+              <strong>Location:</strong> Baxter
               <br>
               <hr>
               <u>Hours:</u>
-              <ul>
                   <li>Monday - Friday | 11 a.m. to 3 p.m.</li>
                   <li>Saturday & Sunday | <b>Closed</b></li>
-              </ul>
           </div>
-      </div>
-      <div class="location" id="location3">
-          <button aria-expanded="false" id="button3" onclick="toggleHours(3)">Caine Student Center - Loading...</button>
-          <div class="hours" id="hours3" aria-hidden="true">
+      </section>
+      <section class="location" id="location3">
+          <button aria-expanded="true" id="button3" onclick="toggleHours(3)">Caine Student Center - Loading...</button>
+          <div class="hours" id="hours3" aria-hidden="false">
               <b>Location:</b> Caine Student Center
               <br>
               <hr>
               <u>Hours:</u>
-                <ul>
                   <li>Monday - Friday | 7 a.m. to 9 p.m.</li>
                   <li>Saturday & Sunday | 11 a.m. to 7 p.m.</li>
-                </ul>
           </div>
-      </div>
-      <div class="location" id="location4">
-          <button aria-expanded="false" id="button4" onclick="toggleHours(4)">Lincoln - Loading...</button>
-          <div class="hours" id="hours4" aria-hidden="true">
+      </section>
+      <section class="location" id="location4">
+          <button aria-expanded="true" id="button4" onclick="toggleHours(4)">Lincoln - Loading...</button>
+          <div class="hours" id="hours4" aria-hidden="false">
               <b>Location:</b> Lincoln
               <br>
               <hr>
               <u>Hours:</u>
-              <ul>
                   <li>Monday - Friday | 7 a.m. to 3 p.m. | 7 p.m. to 10 p.m.</li>
                   <li>Saturday | <b>Closed</b></li>
                   <li>Sunday   | 7 p.m. to 10 p.m.</li>
-              </ul>
           </div>
-      </div>
+      </section>
       <script>
-
+        
 let lastClickedLocationIndex = null;
  // Google Calendar API credentials and calendar IDs
  const api_key = 'AIzaSyAgGt_ZjpjvBYI1r1Zus0OWUo1Qrf14GEU'; // Replace with your Google API key
